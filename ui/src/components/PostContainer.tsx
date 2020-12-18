@@ -3,7 +3,6 @@ import styled from "styled-components";
 import {Post} from "../types/Post";
 import {Alert, Container, Spinner} from "react-bootstrap";
 import {PostComponent} from "./PostComponent";
-import {IGetPosts, PostRequest} from "../types/requests/PostRequest";
 import {User} from "../types/User";
 
 const PostFlexContainer = styled.div `
@@ -26,10 +25,10 @@ export class PostContainer extends React.Component<PostContainerProps, {}> {
     render() {
         let posts : any[] = [];
         this.props.posts.forEach((post : Post) => {
-            posts.push(<PostComponent title={post.title} creator={post.creator}/>);
+            posts.push(<PostComponent post={post} currentUser={this.props.currentUser}/>);
         });
         return (
-            <Container fluid>
+            <Container fluid style={{marginTop : "16px", minHeight : "50vh"}}>
                 <h2>{this.props.title}</h2><hr/>
                 {
                     !this.props.currentUser.permissions.canView &&

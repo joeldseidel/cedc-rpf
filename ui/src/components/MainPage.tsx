@@ -3,16 +3,16 @@ import {NavigationBar} from "./NavigationBar";
 import {User} from "../types/User";
 import {LoginModal} from "./LoginModal";
 import {RegisterModal} from "./RegisterModal";
-import {Container, Jumbotron} from "react-bootstrap";
 import styled from "styled-components";
 import {PostContainer} from "./PostContainer";
 import {FloatingActionButton} from "./FloatingActionButton";
 import {Post} from "../types/Post";
 import {CreatePostModal} from "./CreatePostModal";
 import {IGetPosts, PostRequest} from "../types/requests/PostRequest";
+import {Button} from "react-bootstrap";
 
 export interface MainPageProps {
-    currentUser? : User
+    currentUser : User | undefined;
     handleLogin(user : User) : void;
     handleRegister(user : User) : void;
 }
@@ -21,7 +21,8 @@ export interface MainPageState {
     showLoginModal : boolean;
     showRegisterModal : boolean;
     showCreatePostModal : boolean;
-    posts : Post[]
+    starredPosts : Post[];
+    generalPosts : Post[];
 }
 
 const MainJumbotron = styled.div `
@@ -50,24 +51,24 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         this.handleLogin = this.handleLogin.bind(this);
         this.handleToggleCreatePostModal = this.handleToggleCreatePostModal.bind(this);
         this.handleCreatePost = this.handleCreatePost.bind(this);
+        this.fetchPosts = this.fetchPosts.bind(this);
         this.state = {
             showLoginModal: false,
             showRegisterModal: false,
             showCreatePostModal : false,
-            posts : []
+            starredPosts : [],
+            generalPosts : []
         }
     }
 
     handleRegister(user : User){
-        this.setState({showRegisterModal : false});
         this.props.handleRegister(user);
-        this.fetchPosts();
+        this.setState({showRegisterModal : false});
     }
 
     handleLogin(user : User) {
-        this.setState({showLoginModal : false});
         this.props.handleLogin(user);
-        this.fetchPosts();
+        this.setState({showLoginModal : false});
     }
 
     handleToggleCreatePostModal() {
@@ -76,42 +77,43 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
 
     handleCreatePost(){
         this.setState({showCreatePostModal : false});
-        this.fetchPosts();
+        this.fetchPosts(this.props.currentUser);
     }
 
-    fetchPosts() {
+    fetchPosts(user : User | undefined) {
         let postReq = new PostRequest();
         postReq.getPosts().then((postResponse => {
             let postRes = postResponse as IGetPosts;
-            if(postRes.success && this.props.currentUser != undefined && this.props.currentUser.permissions.canView){
-                this.setState({posts : postRes.posts});
+            if(postRes.success && user != undefined && user.permissions.canView){
+                let starredPosts : Post[] = [];
+                let generalPosts : Post[] = [];
+                for(let i = 0; i < postRes.posts.length; i++){
+                    if(postRes.posts[i].tag == "starred"){
+                        starredPosts.push(postRes.posts[i]);
+                    } else {
+                        generalPosts.push(postRes.posts[i]);
+                    }
+                }
+                this.setState({generalPosts : generalPosts, starredPosts : starredPosts});
             }
         }));
     }
 
     render(){
-        let starredPosts : any[] = [];
-        let generalPosts : any[] = [];
-        this.state.posts.forEach((post) => {
-            if(post.tag == "starred"){
-                starredPosts.push(post);
-            } else {
-                generalPosts.push(post);
-            }
-        });
         return (
             <main>
                 <NavigationBar currentUser={this.props.currentUser} handleToggleLoginModal={() => { this.setState({showLoginModal : !this.state.showLoginModal}); }} handleToggleRegisterModal = {() => { this.setState({showRegisterModal : !this.state.showRegisterModal}) }} />
                 <MainJumbotron id="mainPageJumbo">
                     <MainTitle>CEDC Community Action Forum</MainTitle>
+                    <div style={{backgroundColor : "white"}} onClick={this.handleCreatePost}>&nbsp;</div>
                 </MainJumbotron>
                 {
                     this.props.currentUser != undefined &&
-                        <PostContainer posts={starredPosts} title="Starred Posts" currentUser={this.props.currentUser} />
+                        <PostContainer posts={this.state.starredPosts} title="Starred Posts" currentUser={this.props.currentUser} />
                 }
                 {
                     this.props.currentUser != undefined &&
-                        <PostContainer posts={generalPosts} title="General Posts" currentUser={this.props.currentUser} />
+                        <PostContainer posts={this.state.generalPosts} title="General Posts" currentUser={this.props.currentUser} />
                 }
                 {
                     this.props.currentUser != undefined &&
@@ -127,7 +129,6 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                 }
                 <LoginModal show={this.state.showLoginModal} handleLogin={this.handleLogin} handleRegister={()=> {this.setState({showRegisterModal: true, showLoginModal : false})}} />
                 <RegisterModal show={this.state.showRegisterModal} handleRegister={this.handleRegister} handleCancel={()=> {this.setState({showRegisterModal : false})}}/>
-
             </main>
         );
     }

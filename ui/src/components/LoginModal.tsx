@@ -69,18 +69,18 @@ export class LoginModal extends React.Component<LoginModalProps, LoginModalState
                             <Alert variant="warning">Could not login to CEDC Portal, please enter a value in each field</Alert>
                     }
                     <Form onSubmit={this.handleLogin}>
-                        <InputGroup>
-                            <InputGroup.Prepend>
-                                <InputGroup.Text id="email-label">Email</InputGroup.Text>
-                            </InputGroup.Prepend>
-                            <FormControl type="email" placeholder="Username" aria-label="Username" name="email"/>
-                        </InputGroup>
-                        <InputGroup>
-                            <InputGroup.Prepend>
-                                <InputGroup.Text id="password-label">Password</InputGroup.Text>
-                            </InputGroup.Prepend>
+                        <Form.Group>
+                            <Form.Label>
+                                Email:
+                            </Form.Label>
+                            <FormControl type="email" placeholder="Email Address" aria-label="Username" name="email"/>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>
+                                Password:
+                            </Form.Label>
                             <FormControl type="password" placeholder="Password" aria-label="Password" name="password"/>
-                        </InputGroup>
+                        </Form.Group>
                         <Button variant="secondary" onClick={this.props.handleRegister}>Register</Button>
                         <Button type="submit" variant="primary">Login</Button>
                     </Form>

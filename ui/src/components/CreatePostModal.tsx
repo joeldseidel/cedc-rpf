@@ -33,7 +33,7 @@ export class CreatePostModal extends React.Component<CreatePostModalProps, Creat
         let title = form.elements.newPostTitle.value;
         let creator = this.props.currentUser.email;
         let content = form.elements.newPostContent.value;
-        let tag = form.elements.newPostTag.value;
+        let tag = form.elements.newPostTag == undefined ? "all" : form.elements.newPostTag.value;
         let createdTimeStamp = new Date().toString();
         if(title == "" || content == "") {
             this.setState({isMissingField : true});
@@ -43,7 +43,8 @@ export class CreatePostModal extends React.Component<CreatePostModalProps, Creat
                 creator : creator,
                 content : content,
                 createdTimeStamp : createdTimeStamp,
-                tag : tag
+                tag : tag,
+                comments : []
             };
             let postRequest = new PostRequest();
             postRequest.postPost(post).then(postResponse => {
