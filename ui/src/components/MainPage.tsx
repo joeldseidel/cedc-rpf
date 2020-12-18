@@ -77,14 +77,18 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
 
     handleCreatePost(){
         this.setState({showCreatePostModal : false});
-        this.fetchPosts(this.props.currentUser);
+        this.fetchPosts();
     }
 
-    fetchPosts(user : User | undefined) {
+    componentDidMount() {
+        this.fetchPosts();
+    }
+
+    fetchPosts() {
         let postReq = new PostRequest();
-        postReq.getPosts().then((postResponse => {
+        postReq.getPosts().then((postResponse) => {
             let postRes = postResponse as IGetPosts;
-            if(postRes.success && user != undefined && user.permissions.canView){
+            if(postRes.success){
                 let starredPosts : Post[] = [];
                 let generalPosts : Post[] = [];
                 for(let i = 0; i < postRes.posts.length; i++){
@@ -96,7 +100,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                 }
                 this.setState({generalPosts : generalPosts, starredPosts : starredPosts});
             }
-        }));
+        });
     }
 
     render(){
@@ -104,8 +108,8 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
             <main>
                 <NavigationBar currentUser={this.props.currentUser} handleToggleLoginModal={() => { this.setState({showLoginModal : !this.state.showLoginModal}); }} handleToggleRegisterModal = {() => { this.setState({showRegisterModal : !this.state.showRegisterModal}) }} />
                 <MainJumbotron id="mainPageJumbo">
-                    <MainTitle>CEDC Community Action Forum</MainTitle>
-                    <div style={{backgroundColor : "white"}} onClick={this.handleCreatePost}>&nbsp;</div>
+                    <MainTitle>Collegeville Main Street Revitalization Project Forum</MainTitle>
+                    <div style={{backgroundColor : "white", color : "white"}} >sahfkjlgvndsfghkjdsbjnsdkfbdhsflfgyhksdhfghsdfugholsdhfugkhsdfhglidsfhglhdskflughldsfhgjdljkfghldohfgkjdsfgkhdsfbgkljdhfgdsjkfhgkfjhgkjldsbfgjkhdsfg</div>
                 </MainJumbotron>
                 {
                     this.props.currentUser != undefined &&
