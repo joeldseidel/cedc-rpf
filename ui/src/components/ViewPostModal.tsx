@@ -49,7 +49,7 @@ export class ViewPostModal extends React.Component<ViewPostModalProps, ViewPostM
         if(post.comments != undefined){
             post.comments.push({
                 content : comment,
-                creator : this.props.post.creator,
+                creator : this.props.currentUser.firstName + " " + this.props.currentUser.lastName,
                 createdTimestamp : new Date().toString()
             });
             let commentReq = new PostRequest();
